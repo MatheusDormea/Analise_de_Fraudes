@@ -95,3 +95,42 @@ plt.show()
 explainer = shap.Explainer(xgb)
 shap_values = explainer(x_test[:100])
 shap.plots.bar(shap_values)
+# ==========================================
+# 6. GERAÇÃO E VISUALIZAÇÃO DO GRÁFICO DE GRAFOS
+# ==========================================
+# Vamos pegar uma amostra menor do grafo principal para o desenho não virar uma "mancha preta" ilegível
+df_amostra_grafo = pd.concat([
+    df_projeto[df_projeto["Class"] == 1].head(30), # 30 fraudes
+    df_projeto[df_projeto["Class"] == 0].head(150) # 150 normais
+])
+
+G_visual = nx.Graph()
+for idx, row in df_amostra_grafo.iterrows():
+    G_visual.add_node(row['User_ID'], type='user', label=row['Class'])
+    G_visual.add_node(row['Device_ID'], type='device')
+    G_visual.add_edge(row['User_ID'], row['Device_ID'])
+
+# Mapeia as cores: Vermelho para fraudadores, Azul para legítimos, Cinza para os dispositivos
+cores_nos = []
+for node, data in G_visual.nodes(data=True):
+    if data.get('type') == 'device':
+        cores_nos.append('lightgray')
+    else:
+        if data.get('label') == 1:
+            cores_nos.append('red')
+        else:
+            cores_nos.append('skyblue')
+
+plt.figure(figsize=(12, 10))
+pos = nx.spring_layout(G_visual, k=0.18, seed=42)
+
+# Desenha a estrutura da nossa rede de acessos
+nx.draw_networkx_nodes(G_visual, pos, node_size=60, node_color=cores_nos)
+nx.draw_networkx_edges(G_visual, pos, alpha=0.3, edge_color="silver")
+
+plt.title("Rede de Transações: Vermelho (Fraude) compartilhando infraestrutura com outras contas")
+plt.axis('off')
+
+# Salva a imagem da rede na pasta de imagens
+plt.savefig('images/grafico_grafo.png', bbox_inches='tight')
+plt.show()
