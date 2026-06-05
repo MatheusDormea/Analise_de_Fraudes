@@ -49,6 +49,11 @@ O modelo final foi avaliado priorizando o equilíbrio entre o bloqueio de ameaç
 
 ![alt text](images/relatorio.png)
 
+
+### Recorte do grafo
+
+![alt text](images/grafico_grafo.png)
+
 ### Nível de Importância das Variáveis
 
 ![alt text](images/importancia_das_variaveis.png)
